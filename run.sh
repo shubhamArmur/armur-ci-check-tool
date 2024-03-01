@@ -1,7 +1,7 @@
 #!/bin/bash
 # Stop and remove the old container
-docker stop armur-ci-tool-test
-docker rm armur-ci-tool-test
+docker stop armur_ci_tool_test
+docker rm armur_ci_tool_test
 
 # Remove the old image
 docker rmi armur-ci-tool-test
@@ -10,4 +10,4 @@ docker rmi armur-ci-tool-test
 docker build -t armur-ci-tool-test .
 
 # Run Docker container
-docker run -p 127.0.0.1:3000:3000 armur-ci-tool-test
+docker run --name armur_ci_tool_test -p 127.0.0.1:3000:3000 armur-ci-tool-test
