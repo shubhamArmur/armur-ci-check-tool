@@ -59,7 +59,18 @@ class GHAapp < Sinatra::Application
       if @payload['action'] == 'requested' || @payload['action'] == 'rerequested'
         create_check_run
       end
-      # Add check_run event handling here
+      # Add check_run method here
+    when 'check_run'
+      # Check that the event is being sent to this app
+      if @payload["check_run"]["app"]["id"].to_s == APP_IDENTIFIER
+        case @payload['action']
+        when 'created'
+          initiate_check_run
+        when 'rerequested'
+          create_check_run
+          #ADD REQUESTED_ACTION METHOD HERE
+        end
+      end
     end
     200 # success status
   end
@@ -85,6 +96,29 @@ class GHAapp < Sinatra::Application
   
 
     # ADD INITIATE_CHECK_RUN HELPER METHOD HERE #
+    def initiate_check_run
+      #Once the check run is created, you'll update the status of the check run
+      # to "in_progress" and run the CI process, When the CI finishes, you'll
+      # update the check run status to completed and add the CI results.
+
+      @installation_client.update_check_run(
+        @payload['repository']['full_name'],
+        @payload['check_run']['id'],
+        status: 'in_progress',
+        accept: 'application/vnd.github+json'
+      )
+
+      # ***** RUN A CI TEST *****
+      # MARK the check run as completed!
+      @installation_client.update_check_run(
+        @payload['repository']['full_name'],
+        @payload['check_run']['id'],
+        status: 'completed',
+        conclusion: 'success',
+        accept: 'application/vnd.github+json'
+      )
+
+    end
 
     # ADD CLONE_REPOSITORY HELPER METHOD HERE #
 
